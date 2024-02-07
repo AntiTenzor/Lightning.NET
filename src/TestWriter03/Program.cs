@@ -110,14 +110,19 @@ namespace TestWriter03
 
 
 
-                    res = tx.Put(db, 9, Encoding.UTF8.GetBytes("Вставляю значение с целым ключом. Получилось?"));
+                    res = tx.Put(db, 9, Encoding.UTF8.GetBytes("String value for integer key 9. Is it OK?"));
                     Console.WriteLine("Result of Put for INTEGER key 9: {0}", res);
 
 
 
-                    res = tx.Put(db, 3, Encoding.UTF8.GetBytes("Значение с целым ключом 3 теперь должно быть в начале списка. Получилось?"));
+                    res = tx.Put(db, 3, Encoding.UTF8.GetBytes("Value with integer key 3 now should be located before keys 7 and 9. Is it OK?"));
                     Console.WriteLine("Result of Put for INTEGER key 3: {0}", res);
 
+
+                    if (tx.TryGet(db, 3, out byte[] getBy3))
+                        Console.WriteLine("Result of TryGet(3)            : {0}", Encoding.UTF8.GetString(getBy3));
+                    else
+                        Console.WriteLine("TryGet(3) returned FALSE.");
 
 
                     // Коммит закрывает транзакцию
