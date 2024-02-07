@@ -146,9 +146,10 @@ namespace TestWriter03
 
                     Console.WriteLine();
 
-                    Console.WriteLine("Iterating over DB...");
+                    Console.WriteLine("Iterating over DB with FOREACH loop...");
                     using (var curs = tx.CreateCursor(db))
                     {
+                        // .AsEnumerable() is quite slow method
                         foreach (var kvp in curs.AsEnumerable())
                         {
                             string tkey = String.Join(", ", kvp.Item1.CopyToNewArray());
@@ -156,6 +157,23 @@ namespace TestWriter03
                             Console.WriteLine($"  key:[ {tkey} ] ==> {tval}");
                         }
                     }
+                    Console.WriteLine();
+
+
+                    Console.WriteLine("Iterating over DB with WHILE loop...");
+                    using (LightningCursor curs = tx.CreateCursor(db))
+                    {
+                        while (curs.Next() == MDBResultCode.Success)
+                        {
+                            var (c_resultCode, c_key, c_value) = curs.GetCurrent();
+                            c_resultCode.ThrowOnError();
+
+                            string tkey = String.Join(", ", c_key.CopyToNewArray());
+                            string tval = Encoding.UTF8.GetString(c_value.CopyToNewArray());
+                            Console.WriteLine($"  key:[ {tkey} ] ==> {tval}");
+                        }
+                    }
+                    Console.WriteLine();
                 }
                 Console.WriteLine();
 
