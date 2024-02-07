@@ -27,8 +27,11 @@ public sealed class LightningDatabase : IDisposable
         if (transaction == null)
             throw new ArgumentNullException(nameof(transaction));
 
+        if (configuration == null)
+            throw new ArgumentNullException(nameof(configuration));
+
         Name = name;
-        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        _configuration = configuration;
         _closeOnDispose = closeOnDispose;
         Environment = transaction.Environment;
         _transaction = transaction;
@@ -79,6 +82,11 @@ public sealed class LightningDatabase : IDisposable
     /// Environment in which the database was opened.
     /// </summary>
     public LightningEnvironment Environment { get; }
+
+    /// <summary>
+    /// Database open flags declared in DB configuration
+    /// </summary>
+    public DatabaseOpenFlags Flags { get { return _configuration.Flags; } }
 
     /// <summary>
     /// Drops the database.
