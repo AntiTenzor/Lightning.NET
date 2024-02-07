@@ -18,6 +18,8 @@ namespace TestWriter03
         {
             // Байтовое представление числа 0
             byte[] keyHello = new byte[4];
+            // Байтовое представление числа 7
+            byte[] keyForNull = new byte[] { 0, 0, 0, 7 };
 
             EnvironmentConfiguration envConf = new EnvironmentConfiguration();
             envConf.MaxDatabases = 4;
@@ -73,7 +75,12 @@ namespace TestWriter03
                     // BadValSize -- Нельзя использовать ключ нулевой длины!
                     Console.WriteLine("Result of Delete with empty key: {0}", res);
 
-                    //tx.Commit();
+
+
+
+                    res = tx.Delete(db, null);
+                    // BadValSize -- Нельзя использовать ключ NULL!
+                    Console.WriteLine("Result of Delete with NULL key : {0}", res);
 
 
 
@@ -89,6 +96,17 @@ namespace TestWriter03
                     // BadValSize -- Нельзя использовать ключ нулевой длины!
                     Console.WriteLine("Result of Put for EMPTY key    : {0}", res);
 
+
+
+                    res = tx.Put(db, keyForNull, null);
+                    // К сожалению, значение NULL превратится в массив нулевой длины?
+                    Console.WriteLine("Result of Put for NULL value   : {0}", res);
+
+                    ok = tx.TryGet(db, keyForNull, out byte[] getNull);
+                    if (ok)
+                        Console.WriteLine("Result of Get(keyForNull) IS NULL? {0}", (getNull == null));
+                    else
+                        Console.WriteLine("НЕ СМОГ ПОЛУЧИТЬ ЗНАЧЕНИЕ ПО ЕГО КЛЮЧУ keyForNull!");
 
 
 
