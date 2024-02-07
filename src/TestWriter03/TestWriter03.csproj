@@ -53,7 +53,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\LightningDB\LightningDB.csproj">
+    <ProjectReference Include="..\LightningDB\LightningDB.csproj">
       <Project>{c864e62b-5c53-479c-9a6f-6d086e1ec3df}</Project>
       <Name>LightningDB</Name>
     </ProjectReference>
