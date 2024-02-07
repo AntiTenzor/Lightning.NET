@@ -72,6 +72,27 @@ public static class LightningExtensions
     }
 
     /// <summary>
+    /// Tries to get a value by its integer key.
+    /// </summary>
+    /// <param name="tx">The transaction.</param>
+    /// <param name="db">The database to query.</param>
+    /// <param name="key">The integer key to look up.</param>
+    /// <param name="value">A byte array containing the value found in the database, if it exists.</param>
+    /// <returns>True if key exists, false if not.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryGet(this LightningTransaction tx, LightningDatabase db, int key, out byte[] value)
+    {
+        var (resultCode, _, mdbValue) = tx.Get(db, key);
+        if (resultCode == MDBResultCode.Success)
+        {
+            value = mdbValue.CopyToNewArray();
+            return true;
+        }
+        value = default;
+        return false;
+    }
+
+    /// <summary>
     /// Tries to get a value by its key.
     /// </summary>
     /// <param name="tx">The transaction.</param>
