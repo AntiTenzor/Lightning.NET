@@ -149,11 +149,39 @@ public sealed class LightningTransaction : IDisposable
     }
 
     /// <summary>
+    /// Put data into a database for an integer key.
+    /// </summary>
+    /// <param name="db">The database to query.</param>
+    /// <param name="key">An integer key for this data.</param>
+    /// <param name="value">A byte array containing the value to put in the database.</param>
+    /// <param name="options">Operation options (optional).</param>
+    public unsafe MDBResultCode Put(LightningDatabase db, int key, byte[] value, PutOptions options = PutOptions.None)
+    {
+        if (db == null)
+            throw new ArgumentNullException(nameof(db));
+
+        // It is better to return BadValSize when (value==null), than to replace it with empty array.
+        if (value == null)
+            return MDBResultCode.BadValSize;
+
+        // TODO: Should we check that DB was created with flag DatabaseOpenFlags.IntegerKey?
+
+        byte* keyPtr = (byte*)(&key);
+        fixed (byte* valuePtr = value)
+        {
+            var mdbKey = new MDBValue(sizeof(int), keyPtr);
+            var mdbValue = new MDBValue(value.Length, valuePtr);
+
+            return mdb_put(_handle, db.Handle(), mdbKey, mdbValue, options);
+        }
+    }
+
+    /// <summary>
     /// Put data into a database.
     /// </summary>
     /// <param name="db">The database to query.</param>
     /// <param name="key">A span containing the key to look up.</param>
-    /// <param name="value">A byte array containing the value found in the database, if it exists.</param>
+    /// <param name="value">A byte array containing the value to put in the database.</param>
     /// <param name="options">Operation options (optional).</param>
     public unsafe MDBResultCode Put(LightningDatabase db, byte[] key, byte[] value, PutOptions options = PutOptions.None)
     {
