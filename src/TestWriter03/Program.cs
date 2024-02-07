@@ -125,6 +125,18 @@ namespace TestWriter03
                         Console.WriteLine("TryGet(3) returned FALSE.");
 
 
+
+                    res = tx.Put(db, 2, Encoding.UTF8.GetBytes("FIRST_VAL for integer key 2. You should NOT see this after next Put."));
+                    Console.WriteLine("Result of Put for INTEGER key 2: {0}", res);
+
+                    res = tx.Put(db, 2, Encoding.UTF8.GetBytes("SECOND_VAL for integer key 2. You should NOT see this after next Put."));
+                    Console.WriteLine("Result of Put for INTEGER key 2: {0}", res);
+
+                    res = tx.Put(db, 2, Encoding.UTF8.GetBytes("THIRD_VAL for integer key 2. You SHOULD see this. It is the last Put for this key."));
+                    Console.WriteLine("Result of Put for INTEGER key 2: {0}", res);
+
+
+
                     // Коммит закрывает транзакцию
                     res = tx.Commit();
                     Console.WriteLine("Result of tx.Commit()          : {0}", res);
