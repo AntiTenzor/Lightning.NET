@@ -155,9 +155,28 @@ public sealed class LightningTransaction : IDisposable
     /// <param name="key">A span containing the key to look up.</param>
     /// <param name="value">A byte array containing the value found in the database, if it exists.</param>
     /// <param name="options">Operation options (optional).</param>
-    public MDBResultCode Put(LightningDatabase db, byte[] key, byte[] value, PutOptions options = PutOptions.None)
-    {//argument validation delegated to next call
-        return Put(db, key.AsSpan(), value.AsSpan(), options);
+    public unsafe MDBResultCode Put(LightningDatabase db, byte[] key, byte[] value, PutOptions options = PutOptions.None)
+    {
+        if (db == null)
+            throw new ArgumentNullException(nameof(db));
+
+        if (key == null)
+            return MDBResultCode.BadValSize;
+
+        // TODO: Is it better to return BadValSize when (value==null), than to replace it with zero array?
+
+        // We mimic behavior of AsSpan<T>() which creates object even for null array
+        if (value == null)
+            value = Array.Empty<byte>();
+
+        fixed (byte* keyPtr = key)
+        fixed (byte* valuePtr = value)
+        {
+            var mdbKey = new MDBValue(key.Length, keyPtr);
+            var mdbValue = new MDBValue(value.Length, valuePtr);
+
+            return mdb_put(_handle, db.Handle(), mdbKey, mdbValue, options);
+        }
     }
 
     /// <summary>
