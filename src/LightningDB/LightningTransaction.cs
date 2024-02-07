@@ -123,10 +123,21 @@ public sealed class LightningTransaction : IDisposable
     /// <param name="db">The database to query.</param>
     /// <param name="key">An array containing the key to look up.</param>
     /// <returns>Requested value's byte array if exists, or null if not.</returns>
-    public (MDBResultCode resultCode, MDBValue key, MDBValue value) Get(LightningDatabase db, byte[] key)
-    {//argument validation delegated to next call
-            
-        return Get(db, key.AsSpan());
+    public unsafe (MDBResultCode resultCode, MDBValue key, MDBValue value) Get(LightningDatabase db, byte[] key)
+    {
+        if (db == null)
+            throw new ArgumentNullException(nameof(db));
+
+        if (key == null)
+            return (MDBResultCode.BadValSize, new MDBValue(), new MDBValue());
+
+        fixed (byte* keyBuffer = key)
+        {
+            var mdbKey = new MDBValue(key.Length, keyBuffer);
+
+            var resCode = mdb_get(_handle, db.Handle(), ref mdbKey, out var mdbValue);
+            return (resCode, mdbKey, mdbValue);
+        }
     }
 
     /// <summary>
