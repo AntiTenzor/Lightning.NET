@@ -118,6 +118,24 @@ public sealed class LightningTransaction : IDisposable
     }
 
     /// <summary>
+    /// Get value from a database for a given integer key.
+    /// </summary>
+    /// <param name="db">The database to query.</param>
+    /// <param name="key">An array containing the key to look up.</param>
+    /// <returns>Requested value's byte array if exists, or null if not.</returns>
+    public unsafe (MDBResultCode resultCode, MDBValue key, MDBValue value) Get(LightningDatabase db, int key)
+    {
+        if (db == null)
+            throw new ArgumentNullException(nameof(db));
+
+        byte* keyBuffer = (byte*)(&key);
+        var mdbKey = new MDBValue(sizeof(int), keyBuffer);
+
+        var resCode = mdb_get(_handle, db.Handle(), ref mdbKey, out var mdbValue);
+        return (resCode, mdbKey, mdbValue);
+    }
+
+    /// <summary>
     /// Get value from a database.
     /// </summary>
     /// <param name="db">The database to query.</param>
