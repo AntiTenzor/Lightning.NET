@@ -19,7 +19,7 @@ namespace TestWriter03
             // Байтовое представление числа 0
             byte[] keyHello = new byte[4];
             // Байтовое представление числа 7
-            byte[] keyForNull = new byte[] { 0, 0, 0, 7 };
+            byte[] keyForNull = new byte[] { 7, 0, 0, 0 };
 
             EnvironmentConfiguration envConf = new EnvironmentConfiguration();
             envConf.MaxDatabases = 4;
@@ -72,7 +72,7 @@ namespace TestWriter03
 
                     res = tx.Delete(db,
                         Encoding.UTF8.GetBytes(""));
-                    // BadValSize -- Нельзя использовать ключ нулевой длины!
+                    // BadValSize -- Key must be an array of strictly positive length!
                     Console.WriteLine("Result of Delete with empty key: {0}", res);
 
 
@@ -93,7 +93,7 @@ namespace TestWriter03
 
                     res = tx.Put(db,
                         new byte[0], Encoding.UTF8.GetBytes(val));
-                    // BadValSize -- Нельзя использовать ключ нулевой длины!
+                    // BadValSize -- Key must be an array of strictly positive length!
                     Console.WriteLine("Result of Put for EMPTY key    : {0}", res);
 
 
@@ -107,6 +107,16 @@ namespace TestWriter03
                         Console.WriteLine("Result of Get(keyForNull) IS NULL? {0}", (getNull == null));
                     else
                         Console.WriteLine("НЕ СМОГ ПОЛУЧИТЬ ЗНАЧЕНИЕ ПО ЕГО КЛЮЧУ keyForNull!");
+
+
+
+                    res = tx.Put(db, 9, Encoding.UTF8.GetBytes("Вставляю значение с целым ключом. Получилось?"));
+                    Console.WriteLine("Result of Put for INTEGER key 9: {0}", res);
+
+
+
+                    res = tx.Put(db, 3, Encoding.UTF8.GetBytes("Значение с целым ключом 3 теперь должно быть в начале списка. Получилось?"));
+                    Console.WriteLine("Result of Put for INTEGER key 3: {0}", res);
 
 
 
