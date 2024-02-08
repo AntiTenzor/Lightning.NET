@@ -16,9 +16,9 @@ namespace TestWriter03
 
         static void Main(string[] args)
         {
-            // Байтовое представление числа 0
+            // Byte representation of number 0
             byte[] keyHello = new byte[4];
-            // Байтовое представление числа 7
+            // Byte representation of number 7
             byte[] keyForNull = new byte[] { 7, 0, 0, 0 };
 
             EnvironmentConfiguration envConf = new EnvironmentConfiguration();
@@ -28,7 +28,7 @@ namespace TestWriter03
 
             using (var env = new LightningEnvironment("C:\\tmp\\TestLMDB\\", envConf))
             {
-                // Другие модификаторы слишком мутные, чтобы их использовать
+                // Other modifiers are too strange to use them
                 env.Open(EnvironmentOpenFlags.None);
 
                 using (var tx = env.BeginTransaction())
@@ -40,7 +40,7 @@ namespace TestWriter03
                     MDBResultCode res = tx.TruncateDatabase(db);
                     Console.WriteLine("Result of TruncateDatabase: {0}", res);
                     Console.WriteLine();
-                    // Коммит закрывает транзакцию???
+                    // Commit closes transaction and makes it unusable
                     //tx.Commit();
 
 
@@ -56,7 +56,7 @@ namespace TestWriter03
                     res = tx.Put(db,
                         keyHello, Encoding.UTF8.GetBytes(val));
                     // BadCommand -- нельзя делать Update ??? -- Транзакция после комита возвращает BadCommand
-                    // Коммит закрывает транзакцию!!!
+                    // Commit closes transaction and makes it unusable
                     Console.WriteLine("Result of 2nd Put: {0}", res);
 
 
@@ -137,7 +137,7 @@ namespace TestWriter03
 
 
 
-                    // Коммит закрывает транзакцию
+                    // Commit closes transaction and makes it unusable
                     res = tx.Commit();
                     Console.WriteLine("Result of tx.Commit()          : {0}", res);
                 }
