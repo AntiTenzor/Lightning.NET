@@ -25,7 +25,7 @@ namespace TestWriter01
 
             using (var env = new LightningEnvironment("C:\\tmp\\TestLMDB\\", envConf))
             {
-                // Другие модификаторы слишком мутные, чтобы их использовать
+                // Other modifiers are too strange to use them
                 env.Open(EnvironmentOpenFlags.None);
 
                 using (var tx = env.BeginTransaction())
@@ -37,7 +37,7 @@ namespace TestWriter01
                     MDBResultCode res = tx.TruncateDatabase(db);
                     Console.WriteLine("Result of TruncateDatabase: {0}", res);
                     Console.WriteLine();
-                    // Коммит закрывает транзакцию???
+                    // Commit closes transaction and makes it unusable
                     //tx.Commit();
 
 
@@ -48,13 +48,13 @@ namespace TestWriter01
                         Encoding.UTF8.GetBytes(keyHello), Encoding.UTF8.GetBytes(val));
                     Console.WriteLine("Result of 1st Put: {0}", res);
 
-                    // Коммит закрывает транзакцию???
+                    // Commit closes transaction and makes it unusable
                     //tx.Commit();
 
                     res = tx.Put(db,
                         Encoding.UTF8.GetBytes(keyHello), Encoding.UTF8.GetBytes(val));
                     // BadCommand -- нельзя делать Update ??? -- Транзакция после комита возвращает BadCommand
-                    // Коммит закрывает транзакцию!!!
+                    // Commit closes transaction and makes it unusable
                     Console.WriteLine("Result of 2nd Put: {0}", res);
 
                     //tx.Commit();
