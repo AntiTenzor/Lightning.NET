@@ -93,6 +93,32 @@ public static class LightningExtensions
     }
 
     /// <summary>
+    /// Tries to get a value by its integer key.
+    /// </summary>
+    /// <param name="tx">The transaction.</param>
+    /// <param name="db">The database to query.</param>
+    /// <param name="key">The integer key to look up.</param>
+    /// <param name="encoding">Encoding to convert byte array to string (NOT NULL!).</param>
+    /// <param name="text">A string containing the value found in the database, if it exists.</param>
+    /// <returns>True if key exists, false if not.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryGet(this LightningTransaction tx, LightningDatabase db, int key, System.Text.Encoding encoding, out string text)
+    {
+        if (encoding == null)
+            throw new ArgumentNullException(nameof(encoding));
+
+        var (resultCode, _, mdbValue) = tx.Get(db, key);
+        if (resultCode == MDBResultCode.Success)
+        {
+            byte[] value = mdbValue.CopyToNewArray();
+            text = encoding.GetString(value);
+            return true;
+        }
+        text = default;
+        return false;
+    }
+
+    /// <summary>
     /// Tries to get a value by its key.
     /// </summary>
     /// <param name="tx">The transaction.</param>
