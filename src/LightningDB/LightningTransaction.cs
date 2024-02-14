@@ -206,6 +206,39 @@ public sealed class LightningTransaction : IDisposable
     }
 
     /// <summary>
+    /// Put data into a database for an integer key.
+    /// </summary>
+    /// <param name="db">The database to query.</param>
+    /// <param name="key">An integer key for this data.</param>
+    /// <param name="text">A string containing the value to put in the database.</param>
+    /// <param name="encoding">Encoding to convert string to byte array (NOT NULL!).</param>
+    /// <param name="options">Operation options (optional).</param>
+    public unsafe MDBResultCode Put(LightningDatabase db, int key, string text, System.Text.Encoding encoding, PutOptions options = PutOptions.None)
+    {
+        if (db == null)
+            throw new ArgumentNullException(nameof(db));
+
+        if (encoding == null)
+            throw new ArgumentNullException(nameof(encoding));
+
+        // It is better to return BadValSize when (value==null), than to replace it with empty array.
+        if (text == null)
+            return MDBResultCode.BadValSize;
+
+        // TODO: Should we check that DB was created with flag DatabaseOpenFlags.IntegerKey?
+
+        byte[] value = encoding.GetBytes(text);
+        byte* keyPtr = (byte*)(&key);
+        fixed (byte* valuePtr = value)
+        {
+            var mdbKey = new MDBValue(sizeof(int), keyPtr);
+            var mdbValue = new MDBValue(value.Length, valuePtr);
+
+            return mdb_put(_handle, db.Handle(), mdbKey, mdbValue, options);
+        }
+    }
+
+    /// <summary>
     /// Put data into a database.
     /// </summary>
     /// <param name="db">The database to query.</param>
