@@ -21,6 +21,7 @@ namespace TestWriter03
             envConf.MaxDatabases = 4;
 
             Console.WriteLine("  Max readers: {0}", envConf.MaxReaders);
+            Console.WriteLine("  Map size   : {0} bytes", envConf.MapSize);
 
             using (var env = new LightningEnvironment("C:\\tmp\\TestLMDB\\", envConf))
             {
